@@ -1,6 +1,6 @@
 FEDENA_DEFAULTS = {
-  :company_name => 'Fedena',
-  :company_url  => 'http://www.projectfedena.org'
+  :company_name => 'SmartGurukul',
+  :company_url  => 'http://smartgurukultech.com'
 }
 
 USER_SETTINGS = {}
