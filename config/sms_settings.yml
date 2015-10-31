@@ -1,0 +1,6 @@
+sms_settings:
+ authkey: 9820AyVOxvsz562de1ff
+ sender: 123456
+ host_url: http://sms.ssdindia.com/api/sendhttp.php
+ route: default
+ country: 0

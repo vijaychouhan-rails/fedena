@@ -29,27 +29,12 @@ class SmsManager
     @message = message
     @config = SmsSetting.get_sms_config
     unless @config.blank?
-      @sendername = @config['sms_settings']['sendername']
+      @authkey = @config['sms_settings']['authkey']
+      @message = message
+      @sender = @config['sms_settings']['sender']
+      @route = @config['sms_settings']['route']
+      @country = @config['sms_settings']['country']
       @sms_url = @config['sms_settings']['host_url']
-      @username = @config['sms_settings']['username']
-      @password = @config['sms_settings']['password']
-      @success_code = @config['sms_settings']['success_code']
-      @username_mapping = @config['parameter_mappings']['username']
-      @username_mapping ||= 'username'
-      @password_mapping = @config['parameter_mappings']['password']
-      @password_mapping ||= 'password'
-      @phone_mapping = @config['parameter_mappings']['phone']
-      @phone_mapping ||= 'phone'
-      @sender_mapping = @config['parameter_mappings']['sendername']
-      @sender_mapping ||= 'sendername'
-      @message_mapping = @config['parameter_mappings']['message']
-      @message_mapping ||= 'message'
-      unless @config['additional_parameters'].blank?
-        @additional_param = ""
-        @config['additional_parameters'].split(',').each do |param|
-          @additional_param += "&#{param}"
-        end
-      end
     end
   end
 
@@ -58,12 +43,11 @@ class SmsManager
       message_log = SmsMessage.new(:body=> @message)
       message_log.save
       encoded_message = URI.encode(@message)
-      request = "#{@sms_url}?#{@username_mapping}=#{@username}&#{@password_mapping}=#{@password}&#{@sender_mapping}=#{@sendername}&#{@message_mapping}=#{encoded_message}#{@additional_param}&#{@phone_mapping}="
+      request = "#{@sms_url}?authkey=#{@authkey}&sender=#{@sender}&message=#{@message}&route=#{@route}&country=#{@country}"
       @recipients.each do |recipient|
-        cur_request = request
-        cur_request += "#{recipient}"
+        cur_request = request + "&mobiles=#{recipient}"
         begin
-          response = Net::HTTP.get_response(URI.parse(cur_request))
+          response = Net::HTTP.get_response(URI.parse(URI.encode(cur_request)))
           if response.body.present?
             message_log.sms_logs.create(:mobile=>recipient,:gateway_response=>response.body)
             if @success_code.present?
